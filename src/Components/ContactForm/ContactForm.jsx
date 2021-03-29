@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import useStyles from './useStyles.js';
 
-import { connect } from 'react-redux';
-import contactsActions from '../../redux/contacts-actions';
+import { useSelector, useDispatch } from 'react-redux';
+import { addContact } from '../../redux/contacts-actions';
+import { getContacts } from '../../redux/contacts-selectors';
 
-const ContactForm = ({ onSubmit }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
   const classes = useStyles();
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
@@ -24,12 +27,40 @@ const ContactForm = ({ onSubmit }) => {
         return;
     }
   };
+  const checkNameInContacts = name => {
+    return contacts.find(
+      contact => contact.name.toLowerCase() === name.toLowerCase(),
+    );
+  };
+  const checkNumberInContacts = number => {
+    return contacts.find(contact => contact.number === number);
+  };
+  const checkEmptyBars = (name, number) => {
+    return name === '' || number === '';
+  };
+  const checkSpelling = number => {
+    return !/\d{3}\d{2}\d{3}\d{2}/g.test(number);
+  };
+
+  const ResetFields = () => {
+    setName('');
+    setNumber('');
+  };
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit(name, number);
-    setName('');
-    setNumber('');
+    if (checkNameInContacts(name)) {
+      alert(`${name} is already in contacts!`);
+    } else if (checkNumberInContacts(number)) {
+      alert(` ${number} is already in contacts!`);
+    } else if (checkEmptyBars(name, number)) {
+      alert(`Enter Name and Number in order to add contact`);
+    } else if (checkSpelling(number)) {
+      alert('Enter valid telephone number');
+    } else {
+      dispatch(addContact(name, number));
+    }
+    ResetFields();
   };
 
   return (
@@ -57,9 +88,4 @@ const ContactForm = ({ onSubmit }) => {
   );
 };
 
-const mapDispatchToProps = dispatch => ({
-  onSubmit: (name, number) =>
-    dispatch(contactsActions.addContact(name, number)),
-});
-
-export default connect(null, mapDispatchToProps)(ContactForm);
+export default ContactForm;

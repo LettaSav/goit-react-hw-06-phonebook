@@ -1,18 +1,25 @@
 import useStyles from './useStyle';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import contactsActions from '../../redux/contacts-actions';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteContact } from '../../redux/contacts-actions';
+import { ShowContacts } from '../../redux/contacts-selectors';
 
-const ContactList = ({ contacts, onDeleteContact }) => {
+const ContactList = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const showContacts = useSelector(ShowContacts);
+
   return (
     <ul className={classes.contact_list}>
-      {contacts.map(({ id, name, number }) => (
+      {showContacts.map(({ id, name, number }) => (
         <li key={id} className={classes.contact_item}>
           <p>
             {name}: {number}
           </p>
-          <button className={classes.btn} onClick={() => onDeleteContact(id)}>
+          <button
+            className={classes.btn}
+            onClick={() => dispatch(deleteContact(id))}
+          >
             Delete
           </button>
         </li>
@@ -32,20 +39,4 @@ ContactList.propTypes = {
   ),
 };
 
-const showContacts = (contacts, filter) => {
-  const normalizedFilter = filter.toLowerCase();
-
-  return contacts.filter(({ name }) =>
-    name.toLowerCase().includes(normalizedFilter),
-  );
-};
-
-const mapStateToProps = ({ contacts: { items, filter } }) => ({
-  todos: showContacts(items, filter),
-});
-
-const mapDispatchToProps = dispatch => ({
-  onDeleteContact: contactId => dispatch(contactsActions.deleteTodo(contactId)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ContactList);
+export default ContactList;

@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getContacts } from './redux/contacts-selectors';
 
 import React from 'react';
 
 import ContactForm from './Components/ContactForm/ContactForm';
 import Filter from './Components/Filter/Filter';
 import ContactList from './Components/ContactList/ContactList';
-
 
 import { createUseStyles } from 'react-jss';
 
@@ -27,50 +27,7 @@ const useStyles = createUseStyles({
 });
 function App() {
   const classes = useStyles();
-
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(localStorage.getItem('contacts')) ?? [];
-  });
-
-  React.useEffect(() => {
-    window.localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  // const [filter, setFilter] = useState('');
-
-  // function updateFilter(e) {
-  //   setFilter(e.currentTarget.value);
-  // }
-
-  // const addContact = (name, number) => {
-  //   const newContact = {
-  //     id: uuidv4(),
-  //     name: name,
-  //     number: number,
-  //   };
-  //   if (contacts.find(contact => contact.name === name)) {
-  //     alert(`${name} is already in contacts!`);
-  //   } else if (contacts.find(contact => contact.number === number)) {
-  //     alert(` ${number} is already in contacts!`);
-  //   } else if (name === '' || number === '') {
-  //     alert(`Enter Name and Number in order to add contact`);
-  //   } else if (!/\d{3}\d{2}\d{3}\d{2}/g.test(number)) {
-  //     alert('Enter valid telephone number');
-  //   } else {
-  //     setContacts(prevState => [newContact, ...prevState]);
-  //   }
-  // };
-
-  // const onDelete = contactId => {
-  //   setContacts(contacts.filter(({ id }) => id !== contactId));
-  // };
-
-  // const showContacts = () => {
-  //   const normalizeFilter = filter.toLowerCase();
-  //   return contacts.filter(({ name }) =>
-  //     name.toLowerCase().includes(normalizeFilter),
-  //   );
-  // };
+  const contacts = useSelector(getContacts);
 
   return (
     <div className={classes.main_container}>
